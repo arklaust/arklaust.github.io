@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelas Ceria - Manajemen Kelas</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- LOGIN SCREEN -->
+    <div id="login-screen" class="login-container">
+        <div class="login-box">
+            <div class="logo">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <span>Kelas Ceria</span>
+            </div>
+            <h2>Silakan Login</h2>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required>
+                </div>
+                <div class="form-group">
+                    <label for="role">Login sebagai</label>
+                    <select id="role" required>
+                        <option value="">Pilih peran</option>
+                        <option value="admin">Admin</option>
+                        <option value="student">Siswa</option>
+                    </select>
+                </div>
+                <button type="submit">Masuk</button>
+            </form>
+            <div class="login-info">
+                <p><strong>Info Login:</strong></p>
+                <p>Admin: username: admin, password: admin123</p>
+                <p>Siswa: username: siswa, password: siswa123</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APPLICATION (HIDDEN UNTIL LOGIN) -->
+    <div id="app" class="hidden">
+        <header>
+            <div class="logo">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <span>Kelas Ceria</span>
+                <span id="user-role" class="role-badge"></span>
+            </div>
+            <nav>
+                <ul id="nav-menu">
+                    <!-- Navigation items will be populated by JavaScript based on role -->
+                </ul>
+                <button id="logout-btn" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </nav>
+        </header>
+
+        <main>
+            <!-- DASHBOARD PAGE -->
+            <section id="dashboard" class="page active">
+                <h2>Dashboard Kelas</h2>
+                <div class="dashboard-grid">
+                    <div class="stat-card">
+                        <i class="fas fa-users"></i>
+                        <h3>28</h3>
+                        <p>Jumlah Siswa</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-book"></i>
+                        <h3>12</h3>
+                        <p>Mata Pelajaran</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-calendar-check"></i>
+                        <h3>5</h3>
+                        <p>Kegiatan Mendatang</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-chart-line"></i>
+                        <h3>92%</h3>
+                        <p>Kehadiran</p>
+                    </div>
+                </div>
+
+                <h3>Jadwal Hari Ini</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Waktu</th>
+                                <th>Mata Pelajaran</th>
+                                <th>Guru</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>07:00 - 08:30</td>
+                                <td>Matematika</td>
+                                <td>Bu Sari</td>
+                            </tr>
+                            <tr>
+                                <td>08:30 - 10:00</td>
+                                <td>Bahasa Indonesia</td>
+                                <td>Pak Budi</td>
+                            </tr>
+                            <tr>
+                                <td>10:30 - 12:00</td>
+                                <td>IPA</td>
+                                <td>Bu Rina</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- DATA SISWA PAGE -->
+            <section id="students" class="page">
+                <h2>Data Siswa</h2>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>NIS</th>
+                                <th>Nama</th>
+                                <th>Kelas</th>
+                                <th>Tanggal Lahir</th>
+                                <th>Alamat</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>101</td>
+                                <td>Andi Pratama</td>
+                                <td>VIII A</td>
+                                <td>12/05/2010</td>
+                                <td>Jl. Merdeka No. 12</td>
+                            </tr>
+                            <tr>
+                                <td>102</td>
+                                <td>Budi Santoso</td>
+                                <td>VIII A</td>
+                                <td>23/07/2010</td>
+                                <td>Jl. Sudirman No. 45</td>
+                            </tr>
+                            <tr>
+                                <td>103</td>
+                                <td>Citra Lestari</td>
+                                <td>VIII A</td>
+                                <td>05/02/2010</td>
+                                <td>Jl. Diponegoro No. 78</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- JADWAL PELAJARAN PAGE -->
+            <section id="schedule" class="page">
+                <h2>Jadwal Pelajaran</h2>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Hari</th>
+                                <th>07:00 - 08:30</th>
+                                <th>08:30 - 10:00</th>
+                                <th>10:30 - 12:00</th>
+                                <th>13:00 - 14:30</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Senin</td>
+                                <td>Matematika</td>
+                                <td>Bahasa Indonesia</td>
+                                <td>IPA</td>
+                                <td>IPS</td>
+                            </tr>
+                            <tr>
+                                <td>Selasa</td>
+                                <td>Bahasa Inggris</td>
+                                <td>Seni Budaya</td>
+                                <td>PJOK</td>
+                                <td>Prakarya</td>
+                            </tr>
+                            <tr>
+                                <td>Rabu</td>
+                                <td>Matematika</td>
+                                <td>Bahasa Indonesia</td>
+                                <td>Agama</td>
+                                <td>BK</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- INFO KEGIATAN PAGE -->
+            <section id="activities" class="page">
+                <h2>Info Kegiatan</h2>
+                <div class="activity-grid">
+                    <div class="activity-card">
+                        <img src="https://source.unsplash.com/random/300x160?school-event" alt="Kegiatan Sekolah">
+                        <div class="activity-content">
+                            <div class="activity-date">15 Agustus 2023</div>
+                            <h3>Porseni Tingkat Sekolah</h3>
+                            <p>Kompetisi olahraga dan seni untuk seluruh siswa kelas VIII.</p>
+                        </div>
+                    </div>
+                    <div class="activity-card">
+                        <img src="https://source.unsplash.com/random/300x160?field-trip" alt="Study Tour">
+                        <div class="activity-content">
+                            <div class="activity-date">22 Agustus 2023</div>
+                            <h3>Study Tour ke Museum</h3>
+                            <p>Kunjungan edukasi ke museum nasional untuk belajar sejarah.</p>
+                        </div>
+                    </div>
+                    <div class="activity-card">
+                        <img src="https://source.unsplash.com/random/300x160?parent-meeting" alt="Parent Meeting">
+                        <div class="activity-content">
+                            <div class="activity-date">30 Agustus 2023</div>
+                            <h3>Pertemuan Orang Tua</h3>
+                            <p>Silaturahmi dan konsultasi perkembangan siswa dengan wali kelas.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- DASHBOARD ADMIN PAGE -->
+            <section id="admin" class="page">
+                <h2>Dashboard Admin</h2>
+                
+                <div class="dashboard-grid">
+                    <div class="stat-card">
+                        <i class="fas fa-user-plus"></i>
+                        <h3>Tambah Siswa</h3>
+                        <p>Input data siswa baru</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-edit"></i>
+                        <h3>Edit Data</h3>
+                        <p>Perbarui data siswa</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-calendar-alt"></i>
+                        <h3>Atur Jadwal</h3>
+                        <p>Kelola jadwal pelajaran</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-bullhorn"></i>
+                        <h3>Buat Pengumuman</h3>
+                        <p>Posting info kegiatan</p>
+                    </div>
+                </div>
+
+                <h3>Tambah Siswa Baru</h3>
+                <div class="form-container">
+                    <form id="add-student-form">
+                        <div class="form-group">
+                            <label for="nis">NIS</label>
+                            <input type="text" id="nis" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="name">Nama Lengkap</label>
+                            <input type="text" id="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="class">Kelas</label>
+                            <select id="class" required>
+                                <option value="">Pilih Kelas</option>
+                                <option value="XI 6">XI 6</option>
+                            </select>
+                        </div>
+                        <button type="submit">Simpan Data</button>
+                    </form>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2025 XI 6 project by arkan. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
