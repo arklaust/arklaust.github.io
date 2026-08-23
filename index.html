@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com">
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800&family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800;900&family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
     <script>
         tailwind.config = {
             theme: {
@@ -19,6 +19,7 @@
                         line: '#232A36',
                         axiom: '#3DA9FC',
                         anomaly: '#8B7CF6',
+                        warn: '#FF6B57',
                         ink: '#E7ECF5',
                         muted: '#7C8798',
                     },
@@ -26,6 +27,7 @@
                         display: ['Orbitron', 'sans-serif'],
                         ui: ['Rajdhani', 'sans-serif'],
                         body: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
                     },
                 }
             }
@@ -186,9 +188,392 @@
             height: auto;
             background: #0B0E14;
         }
+
+        /* ---------- READER PAGE-LOAD TRANSITION ---------- */
+        #page-reader.reader-enter { animation: readerIn 0.45s ease-out both; }
+        @keyframes readerIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* ---------- READING PROGRESS BAR ---------- */
+        .read-progress-track {
+            position: sticky;
+            top: 64px;
+            z-index: 41;
+            height: 2px;
+            background: #0B0E14;
+        }
+        .read-progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #3DA9FC, #8B7CF6);
+            transition: width 0.15s linear;
+        }
+
+        /* ---------- MODE SWITCHER ---------- */
+        .mode-btn {
+            font-family: 'Rajdhani', sans-serif;
+            letter-spacing: 0.12em;
+        }
+        .mode-btn.active {
+            color: #060709;
+            background: linear-gradient(90deg, #3DA9FC, #8B7CF6);
+            box-shadow: 0 0 16px rgba(61, 169, 252, 0.35);
+        }
+
+        /* ---------- SLIDE MODE ---------- */
+        .slide-viewport {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            touch-action: pan-y;
+            background: #0B0E14;
+        }
+        .slide-track {
+            display: flex;
+            will-change: transform;
+            transition: transform 0.42s cubic-bezier(.65, 0, .35, 1);
+        }
+        .slide-track.dragging { transition: none; }
+        .slide-panel {
+            flex: 0 0 100%;
+            width: 100%;
+            max-width: 100%;
+        }
+        .slide-panel img {
+            width: 100%;
+            height: auto;
+            display: block;
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+        .tap-zone {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 30%;
+            z-index: 5;
+            cursor: pointer;
+        }
+        .slide-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 999px;
+            background: rgba(6, 7, 9, 0.55);
+            border: 1px solid #232A36;
+            color: #E7ECF5;
+            backdrop-filter: blur(4px);
+            transition: border-color 0.2s, color 0.2s, opacity 0.2s;
+        }
+        .slide-arrow:hover { border-color: #3DA9FC; color: #3DA9FC; }
+        .slide-arrow:disabled { opacity: 0; pointer-events: none; }
+
+        /* ---------- BOOK MODE ---------- */
+        .book-stage {
+            position: relative;
+            width: 100%;
+            perspective: 2400px;
+            background: #0B0E14;
+            overflow: hidden;
+        }
+        .book-layer {
+            position: relative;
+            width: 100%;
+        }
+        .book-layer img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        .book-under {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+        }
+        .book-under img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .book-top {
+            position: relative;
+            z-index: 2;
+            transform-origin: left center;
+            transform-style: preserve-3d;
+            transition: transform 0.55s cubic-bezier(.45, 0, .4, 1);
+            box-shadow: -4px 0 24px rgba(0,0,0,0.5);
+        }
+        .book-top.flip-fwd {
+            transform: rotateY(-140deg);
+        }
+        .book-top.flip-back-origin {
+            transform-origin: right center;
+        }
+        .book-top.flip-bwd {
+            transform: rotateY(140deg);
+        }
+        .book-spine-shadow::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, rgba(0,0,0,0.35), transparent 18%);
+            pointer-events: none;
+            z-index: 3;
+        }
+
+        /* ---------- SHARED READER COUNTER / DOTS ---------- */
+        .reader-counter {
+            font-family: 'Rajdhani', sans-serif;
+            letter-spacing: 0.15em;
+        }
+        .end-of-chapter-card {
+            animation: panelIn 0.5s ease-out both;
+        }
+
+        /* =========================================================
+           AMBIENT BACKGROUND SYSTEM
+           ========================================================= */
+        body {
+            position: relative;
+        }
+        #akasha-field {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.55;
+        }
+        .bg-grid {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background-image:
+                linear-gradient(rgba(61,169,252,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(61,169,252,0.05) 1px, transparent 1px);
+            background-size: 64px 64px;
+            -webkit-mask-image: radial-gradient(ellipse 90% 70% at 50% 0%, #000 20%, transparent 75%);
+            mask-image: radial-gradient(ellipse 90% 70% at 50% 0%, #000 20%, transparent 75%);
+        }
+        .bg-glow {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background:
+                radial-gradient(600px 420px at 82% -6%, rgba(139,124,246,0.16), transparent 60%),
+                radial-gradient(560px 380px at 8% 6%, rgba(61,169,252,0.14), transparent 60%);
+        }
+        .grain-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            opacity: 0.05;
+            mix-blend-mode: overlay;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+        }
+        main, #page-landing, #page-reader, nav, footer {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* =========================================================
+           BOOT SEQUENCE (hero intro)
+           ========================================================= */
+        .boot-log {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 0.02em;
+            color: #3DA9FC;
+            min-height: 1.4em;
+            opacity: 0.85;
+        }
+        .boot-log .boot-caret {
+            display: inline-block;
+            width: 7px;
+            height: 12px;
+            background: #3DA9FC;
+            margin-left: 2px;
+            vertical-align: -1px;
+            animation: caretBlink 0.9s steps(1) infinite;
+        }
+        @keyframes caretBlink {
+            0%, 49% { opacity: 1; }
+            50%, 100% { opacity: 0; }
+        }
+        .hero-reveal {
+            opacity: 0;
+            transform: translateY(14px);
+            animation: heroReveal 0.7s cubic-bezier(.16,1,.3,1) forwards;
+        }
+        @keyframes heroReveal {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* =========================================================
+           SCROLL REVEAL
+           ========================================================= */
+        .reveal {
+            opacity: 0;
+            transform: translateY(28px);
+            transition: opacity 0.7s cubic-bezier(.16,1,.3,1), transform 0.7s cubic-bezier(.16,1,.3,1);
+            transition-delay: var(--delay, 0ms);
+        }
+        .reveal.reveal-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* =========================================================
+           CHAPTER LIST — glitch stagger-in + scan sweep
+           ========================================================= */
+        .case-row {
+            position: relative;
+            opacity: 0;
+            transform: translateX(-10px);
+            animation: rowIn 0.5s cubic-bezier(.16,1,.3,1) forwards;
+            animation-delay: var(--row-delay, 0ms);
+            overflow: hidden;
+        }
+        @keyframes rowIn {
+            to { opacity: 1; transform: translateX(0); }
+        }
+        .case-row::before {
+            content: "";
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 2px;
+            background: linear-gradient(180deg, #3DA9FC, #8B7CF6);
+            transform: scaleY(0);
+            transform-origin: top;
+            transition: transform 0.35s ease-out;
+        }
+        .case-row:hover::before { transform: scaleY(1); }
+        .case-row::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(61,169,252,0.06), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease-out;
+            pointer-events: none;
+        }
+        .case-row:hover::after { transform: translateX(100%); }
+        .case-code { font-family: 'JetBrains Mono', monospace; }
+
+        /* =========================================================
+           BUTTON SWEEP MICRO-INTERACTION
+           ========================================================= */
+        .btn-sweep {
+            position: relative;
+            overflow: hidden;
+            isolation: isolate;
+        }
+        .btn-sweep::before {
+            content: "";
+            position: absolute;
+            top: 0; bottom: 0; left: -30%;
+            width: 25%;
+            background: rgba(255,255,255,0.18);
+            transform: skewX(-18deg) translateX(-260%);
+            transition: transform 0.55s ease-out;
+            z-index: -1;
+        }
+        .btn-sweep:hover::before { transform: skewX(-18deg) translateX(600%); }
+
+        /* focus ring for keyboard users */
+        button:focus-visible, input:focus-visible {
+            outline: 2px solid #3DA9FC;
+            outline-offset: 2px;
+            border-radius: 2px;
+        }
+
+        /* =========================================================
+           LIKE BUTTON BURST
+           ========================================================= */
+        #btn-like { position: relative; overflow: visible; }
+        .like-burst {
+            position: absolute;
+            left: 50%; top: 50%;
+            width: 6px; height: 6px;
+            margin: -3px 0 0 -3px;
+            border-radius: 999px;
+            background: #3DA9FC;
+            pointer-events: none;
+            animation: likeBurst 0.6s ease-out forwards;
+        }
+        @keyframes likeBurst {
+            to {
+                transform: translate(var(--bx), var(--by)) scale(0);
+                opacity: 0;
+            }
+        }
+        .like-pulse { animation: likePulse 0.4s cubic-bezier(.34,1.56,.64,1); }
+        @keyframes likePulse {
+            0% { transform: scale(1); }
+            40% { transform: scale(1.18); }
+            100% { transform: scale(1); }
+        }
+
+        /* =========================================================
+           TOAST
+           ========================================================= */
+        .toast {
+            position: fixed;
+            left: 50%;
+            bottom: 28px;
+            transform: translate(-50%, 12px);
+            z-index: 100;
+            background: #0F1218;
+            border: 1px solid #3DA9FC;
+            color: #E7ECF5;
+            font-family: 'Rajdhani', sans-serif;
+            letter-spacing: 0.08em;
+            font-size: 13px;
+            padding: 10px 18px;
+            border-radius: 999px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.4), 0 0 20px rgba(61,169,252,0.25);
+            opacity: 0;
+            animation: toastIn 0.35s ease-out forwards, toastOut 0.35s ease-in forwards 2.1s;
+        }
+        @keyframes toastIn { to { opacity: 1; transform: translate(-50%, 0); } }
+        @keyframes toastOut { to { opacity: 0; transform: translate(-50%, 8px); } }
+
+        /* =========================================================
+           REDUCED MOTION — master override
+           ========================================================= */
+        @media (prefers-reduced-motion: reduce) {
+            .glitch::before, .glitch::after,
+            .signal-bar, .panel-fade,
+            .hero-reveal, .reveal, .case-row,
+            .case-row::before, .case-row::after,
+            .btn-sweep::before, .like-burst, .like-pulse,
+            .toast, .boot-log .boot-caret {
+                animation: none !important;
+                transition: none !important;
+                opacity: 1 !important;
+                transform: none !important;
+            }
+            #akasha-field { display: none; }
+        }
     </style>
 </head>
 <body class="bg-void text-ink font-body antialiased">
+
+    <!-- Ambient layers -->
+    <canvas id="akasha-field"></canvas>
+    <div class="bg-grid"></div>
+    <div class="bg-glow"></div>
+    <div class="grain-overlay"></div>
 
     <!-- ===================== NAVIGATION ===================== -->
     <nav class="fixed top-0 left-0 right-0 z-50 bg-void/85 backdrop-blur border-b border-line">
@@ -198,9 +583,9 @@
                 <span class="font-display text-sm sm:text-base tracking-[0.15em]">BEYOND<span class="text-axiom">//</span>BORDERLINE</span>
             </button>
             <div class="hidden sm:flex items-center gap-8 font-ui text-sm tracking-wider text-muted">
-                <button onclick="scrollToSection('sinopsis')" class="hover:text-axiom transition-colors">SINOPSIS</button>
-                <button onclick="scrollToSection('chapters')" class="hover:text-axiom transition-colors">ARSIP CHAPTER</button>
-                <button onclick="openReader(1)" class="px-4 py-2 border border-axiom/60 text-axiom rounded-sm hover:bg-axiom hover:text-void transition-colors">BACA SEKARANG</button>
+                <button onclick="scrollToSection('sinopsis')" class="relative hover:text-axiom transition-colors after:content-[''] after:absolute after:left-0 after:-bottom-1 after:h-px after:w-0 after:bg-axiom after:transition-all hover:after:w-full">SINOPSIS</button>
+                <button onclick="scrollToSection('chapters')" class="relative hover:text-axiom transition-colors after:content-[''] after:absolute after:left-0 after:-bottom-1 after:h-px after:w-0 after:bg-axiom after:transition-all hover:after:w-full">ARSIP CHAPTER</button>
+                <button onclick="openReader(1)" class="btn-sweep px-4 py-2 border border-axiom/60 text-axiom rounded-sm hover:bg-axiom hover:text-void transition-colors">BACA SEKARANG</button>
             </div>
             <button onclick="openReader(1)" class="sm:hidden px-3 py-1.5 border border-axiom/60 text-axiom text-xs font-ui rounded-sm">BACA</button>
         </div>
@@ -216,21 +601,22 @@
                 <div class="absolute inset-0 bg-gradient-to-t from-void via-void/70 to-void/30"></div>
                 <div class="absolute inset-0 bg-gradient-to-r from-void/90 via-transparent to-void/60"></div>
             </div>
-            <div class="absolute top-0 left-0 right-0 h-[2px] signal-bar"></div>
+            <div class="absolute top-0 left-0 right-0 h-[3px] signal-bar"></div>
 
             <div class="relative max-w-6xl mx-auto px-5 sm:px-8 pb-16 sm:pb-24 w-full">
-                <p class="font-ui text-axiom tracking-[0.4em] text-xs sm:text-sm mb-4">ANOMALY CASE FILE — REGISTRY 0001</p>
-                <h1 class="glitch font-display text-4xl sm:text-6xl md:text-7xl font-800 leading-tight text-ink" data-text="BEYOND THE BORDERLINE">BEYOND THE BORDERLINE</h1>
-                <p class="font-ui text-lg sm:text-2xl text-anomaly mt-3 tracking-wide">Dari titik nol, kisah ini baru saja dimulai.</p>
-                <p class="font-body text-muted max-w-xl mt-4 text-sm sm:text-base leading-relaxed">
+                <p id="boot-log" class="boot-log mb-3"></p>
+                <p class="hero-reveal font-ui text-axiom tracking-[0.4em] text-xs sm:text-sm mb-4" style="animation-delay:0.05s">ANOMALY CASE FILE — REGISTRY 0001</p>
+                <h1 class="hero-reveal glitch font-display text-4xl sm:text-6xl md:text-7xl font-800 leading-tight text-ink" data-text="BEYOND THE BORDERLINE" style="animation-delay:0.15s">BEYOND THE BORDERLINE</h1>
+                <p class="hero-reveal font-ui text-lg sm:text-2xl text-anomaly mt-3 tracking-wide" style="animation-delay:0.28s">Dari titik nol, kisah ini baru saja dimulai.</p>
+                <p class="hero-reveal font-body text-muted max-w-xl mt-4 text-sm sm:text-base leading-relaxed" style="animation-delay:0.38s">
                     Seorang arsiparis kota yang bisa membaca "kode dasar" realitas — Axiom of Akasha.
                     Tapi setiap kali ia menggunakannya, sebagian ingatannya sendiri terhapus.
                 </p>
-                <div class="flex flex-wrap gap-4 mt-8">
-                    <button onclick="openReader(1)" class="px-6 py-3 bg-axiom text-void font-ui font-700 tracking-wide rounded-sm hover:bg-white transition-colors shadow-[0_0_25px_rgba(61,169,252,0.35)]">
+                <div class="hero-reveal flex flex-wrap gap-4 mt-8" style="animation-delay:0.5s">
+                    <button onclick="openReader(1)" class="btn-sweep px-6 py-3 bg-axiom text-void font-ui font-700 tracking-wide rounded-sm hover:bg-white transition-colors shadow-[0_0_25px_rgba(61,169,252,0.35)]">
                         ▶ BACA CHAPTER 1
                     </button>
-                    <button onclick="scrollToSection('sinopsis')" class="px-6 py-3 border border-line text-ink font-ui font-600 tracking-wide rounded-sm hover:border-axiom hover:text-axiom transition-colors">
+                    <button onclick="scrollToSection('sinopsis')" class="btn-sweep px-6 py-3 border border-line text-ink font-ui font-600 tracking-wide rounded-sm hover:border-axiom hover:text-axiom transition-colors">
                         SINOPSIS
                     </button>
                 </div>
@@ -238,7 +624,7 @@
         </header>
 
         <!-- SINOPSIS & KARAKTER -->
-        <section id="sinopsis" class="max-w-6xl mx-auto px-5 sm:px-8 py-20 sm:py-28">
+        <section id="sinopsis" class="reveal max-w-6xl mx-auto px-5 sm:px-8 py-20 sm:py-28">
             <p class="font-ui text-anomaly tracking-[0.3em] text-xs mb-3">LOG 001 — SUBJEK</p>
             <h2 class="font-display text-2xl sm:text-4xl font-700 mb-10">Siapa Itu Arkanu?</h2>
 
@@ -287,7 +673,7 @@
         </section>
 
         <!-- CHAPTER LIST — "Anomaly Log" -->
-        <section id="chapters" class="max-w-6xl mx-auto px-5 sm:px-8 pb-24 sm:pb-32">
+        <section id="chapters" class="reveal max-w-6xl mx-auto px-5 sm:px-8 pb-24 sm:pb-32">
             <p class="font-ui text-anomaly tracking-[0.3em] text-xs mb-3">LOG 002 — ARSIP</p>
             <h2 class="font-display text-2xl sm:text-4xl font-700 mb-2">Arsip Chapter</h2>
             <p class="text-muted text-sm mb-10">Setiap entri adalah laporan kasus anomali yang telah diverifikasi.</p>
@@ -296,7 +682,7 @@
         </section>
 
         <!-- FOOTER -->
-        <footer class="border-t border-line py-10">
+        <footer class="reveal border-t border-line py-10">
             <div class="max-w-6xl mx-auto px-5 sm:px-8 flex flex-col sm:flex-row justify-between items-center gap-4">
                 <p class="font-ui text-sm tracking-widest text-muted">BEYOND<span class="text-axiom">//</span>BORDERLINE — ORIGINAL WEBTOON</p>
                 <p class="text-xs text-muted/70">Karya fiksi original. Semua karakter &amp; dunia adalah fiktif.</p>
@@ -319,6 +705,24 @@
                     <button onclick="navChapter(1)" id="btn-next-top" class="px-3 py-1.5 border border-line rounded-sm text-xs font-ui hover:border-axiom hover:text-axiom transition-colors disabled:opacity-30 disabled:pointer-events-none">NEXT ›</button>
                 </div>
             </div>
+
+            <!-- Reading mode switcher -->
+            <div class="max-w-3xl mx-auto px-5 sm:px-8 pb-3 flex items-center justify-between gap-3">
+                <div class="flex items-center gap-3 min-w-0">
+                    <span class="hidden sm:block font-ui text-[11px] tracking-[0.2em] text-muted/70 shrink-0">MODE BACA</span>
+                    <div class="flex items-center gap-1 p-1 bg-panel border border-line rounded-full shrink-0">
+                        <button onclick="setReadingMode('scroll')" data-mode-btn="scroll" class="mode-btn px-3 sm:px-4 py-1.5 rounded-full text-xs text-muted transition-all">SCROLL</button>
+                        <button onclick="setReadingMode('slide')" data-mode-btn="slide" class="mode-btn px-3 sm:px-4 py-1.5 rounded-full text-xs text-muted transition-all">SLIDE</button>
+                        <button onclick="setReadingMode('book')" data-mode-btn="book" class="mode-btn px-3 sm:px-4 py-1.5 rounded-full text-xs text-muted transition-all">BOOK</button>
+                    </div>
+                </div>
+                <p id="reader-counter" class="reader-counter text-xs text-muted shrink-0">— / —</p>
+            </div>
+        </div>
+
+        <!-- Reading progress -->
+        <div class="read-progress-track">
+            <div class="read-progress-fill" id="read-progress-fill"></div>
         </div>
 
         <!-- Panels -->
@@ -353,7 +757,7 @@
                 <p class="font-ui text-sm tracking-widest text-anomaly mb-4">KOLOM KOMENTAR (<span id="comment-count">0</span>)</p>
                 <div class="flex gap-2 mb-6">
                     <input id="comment-input" type="text" placeholder="Tulis komentarmu..." class="flex-1 bg-panel border border-line rounded-sm px-4 py-2.5 text-sm text-ink placeholder-muted/60 focus:outline-none focus:border-axiom" />
-                    <button onclick="addComment()" class="px-5 py-2.5 bg-axiom text-void font-ui font-700 text-sm rounded-sm hover:bg-white transition-colors">KIRIM</button>
+                    <button onclick="addComment()" class="btn-sweep px-5 py-2.5 bg-axiom text-void font-ui font-700 text-sm rounded-sm hover:bg-white transition-colors">KIRIM</button>
                 </div>
                 <div id="comment-list" class="space-y-4"></div>
             </div>
@@ -459,20 +863,139 @@
             { name: "gatau siapa", text: "lanjutin pls" },
         ];
 
+        /* ---------- READING MODE STATE ---------- */
+        let readingMode = 'scroll';   // 'scroll' | 'slide' | 'book'
+        let panelIndex = 0;           // current panel index for slide/book modes
+        let isFlipping = false;       // lock during book flip animation
+        let dragState = null;         // active touch/drag tracking
+
         /* ---------- RENDER CHAPTER LIST ---------- */
         function renderChapterList() {
             const list = document.getElementById('chapter-list');
-            list.innerHTML = CHAPTERS.map(ch => `
-            <button onclick="openReader(${ch.id})" class="case-row w-full flex items-center justify-between gap-4 px-5 py-4 text-left hover:bg-panel transition-colors">
+            list.innerHTML = CHAPTERS.map((ch, i) => `
+            <button onclick="openReader(${ch.id})" style="--row-delay:${i * 70}ms" class="case-row group w-full flex items-center justify-between gap-4 px-5 py-4 text-left hover:bg-panel transition-colors">
               <div class="flex items-center gap-4 min-w-0">
                 <span class="case-code font-ui text-xs sm:text-sm text-muted tracking-widest transition-colors shrink-0">${ch.code}</span>
                 <span class="font-ui text-sm sm:text-base text-ink truncate">${ch.id === 1 ? `Chapter ${ch.id} — ${ch.title}` : `${ch.title}`}</span>
               </div>
-              <span class="text-axiom text-lg shrink-0">${ch.id === 1 ? '›' : '…'}</span>
+              <span class="text-axiom text-lg shrink-0 transition-transform group-hover:translate-x-1">${ch.id === 1 ? '›' : '…'}</span>
             </button>
           `).join('');
         }
         renderChapterList();
+
+        /* ---------- SCROLL REVEAL (IntersectionObserver) ---------- */
+        (function initScrollReveal() {
+            const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            const targets = document.querySelectorAll('.reveal');
+            if (reduceMotion || !('IntersectionObserver' in window)) {
+                targets.forEach(t => t.classList.add('reveal-in'));
+                return;
+            }
+            const io = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('reveal-in');
+                        io.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
+            targets.forEach(t => io.observe(t));
+        })();
+
+        /* ---------- HERO BOOT SEQUENCE ---------- */
+        (function bootSequence() {
+            const el = document.getElementById('boot-log');
+            if (!el) return;
+            const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            const lines = [
+                '> INIT ARCHIVE_SYSTEM...',
+                '> LOADING CASE FILE: REGISTRY 0001...',
+                '> AXIOM VERIFICATION: PASSED'
+            ];
+            if (reduceMotion) { el.textContent = lines[lines.length - 1]; return; }
+
+            let li = 0, ci = 0;
+            el.innerHTML = '<span class="boot-caret"></span>';
+            function typeLine() {
+                if (li >= lines.length) return;
+                const current = lines[li];
+                if (ci <= current.length) {
+                    el.innerHTML = current.slice(0, ci) + '<span class="boot-caret"></span>';
+                    ci++;
+                    setTimeout(typeLine, 14 + Math.random() * 18);
+                } else {
+                    li++;
+                    ci = 0;
+                    setTimeout(typeLine, li >= lines.length ? 0 : 260);
+                }
+            }
+            setTimeout(typeLine, 200);
+        })();
+
+        /* ---------- AKASHA PARTICLE FIELD (ambient canvas) ---------- */
+        (function akashaField() {
+            const canvas = document.getElementById('akasha-field');
+            if (!canvas) return;
+            const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            if (reduceMotion) return;
+            const ctx = canvas.getContext('2d');
+            let w, h, particles;
+            const COUNT = Math.min(70, Math.floor(window.innerWidth / 18));
+
+            function resize() {
+                w = canvas.width = window.innerWidth;
+                h = canvas.height = window.innerHeight;
+            }
+            function makeParticles() {
+                particles = Array.from({ length: COUNT }, () => ({
+                    x: Math.random() * w,
+                    y: Math.random() * h,
+                    r: Math.random() * 1.4 + 0.3,
+                    vy: -(Math.random() * 0.18 + 0.04),
+                    vx: (Math.random() - 0.5) * 0.06,
+                    hueMix: Math.random(),
+                    alpha: Math.random() * 0.5 + 0.15,
+                    twinkle: Math.random() * Math.PI * 2,
+                }));
+            }
+            resize();
+            makeParticles();
+            window.addEventListener('resize', () => { resize(); });
+
+            function draw() {
+                ctx.clearRect(0, 0, w, h);
+                for (const p of particles) {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.twinkle += 0.02;
+                    if (p.y < -10) { p.y = h + 10; p.x = Math.random() * w; }
+                    if (p.x < -10) p.x = w + 10;
+                    if (p.x > w + 10) p.x = -10;
+                    const tw = (Math.sin(p.twinkle) + 1) / 2;
+                    const a = p.alpha * (0.5 + tw * 0.5);
+                    const c1 = [61, 169, 252], c2 = [139, 124, 246];
+                    const mixed = c1.map((v, i) => Math.round(v + (c2[i] - v) * p.hueMix));
+                    ctx.beginPath();
+                    ctx.fillStyle = `rgba(${mixed[0]},${mixed[1]},${mixed[2]},${a})`;
+                    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                requestAnimationFrame(draw);
+            }
+            requestAnimationFrame(draw);
+        })();
+
+        /* ---------- TOAST HELPER ---------- */
+        function showToast(message) {
+            const existing = document.querySelector('.toast');
+            if (existing) existing.remove();
+            const el = document.createElement('div');
+            el.className = 'toast';
+            el.textContent = message;
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 2500);
+        }
 
         /* ---------- VIEW SWITCHING ---------- */
         function showLanding() {
@@ -490,10 +1013,26 @@
 
         function openReader(chapterId) {
             currentChapter = chapterId;
+            panelIndex = 0;
             document.getElementById('page-landing').classList.add('hidden');
-            document.getElementById('page-reader').classList.remove('hidden');
+            const reader = document.getElementById('page-reader');
+            reader.classList.remove('hidden');
+            reader.classList.remove('reader-enter');
+            void reader.offsetWidth; // restart animation
+            reader.classList.add('reader-enter');
             renderReader();
             window.scrollTo({ top: 0, behavior: 'instant' });
+        }
+
+        /* ---------- MODE SWITCHING ---------- */
+        function setReadingMode(mode) {
+            if (readingMode === mode) return;
+            readingMode = mode;
+            panelIndex = 0;
+            document.querySelectorAll('[data-mode-btn]').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.modeBtn === mode);
+            });
+            renderReader();
         }
 
         function renderReader() {
@@ -504,13 +1043,13 @@
             document.getElementById('reader-title').textContent =
                 `${ch.code} · ${ch.id === 1 ? `Chapter ${ch.id} — ${ch.title}` : ch.title}`;
 
-            const container = document.getElementById('panel-container');
-            container.innerHTML = ch.panels.map((p, i) => `
-            <div class="panel-fade" style="animation-delay:${i * 50}ms">
-              <img src="${p.img}" class="panel-img" alt="Panel ${i + 1}" loading="lazy" />
-              ${p.caption ? `<p class="font-ui text-xs sm:text-sm text-muted italic px-5 sm:px-8 py-4 bg-panel border-b border-line">${p.caption}</p>` : ''}
-            </div>
-          `).join('');
+            document.querySelectorAll('[data-mode-btn]').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.modeBtn === readingMode);
+            });
+
+            if (readingMode === 'scroll') renderScrollMode(ch);
+            else if (readingMode === 'slide') renderSlideMode(ch);
+            else renderBookMode(ch);
 
             ['btn-prev-top', 'btn-prev-bottom'].forEach(id => document.getElementById(id).disabled = isFirst);
             ['btn-next-top', 'btn-next-bottom'].forEach(id => document.getElementById(id).disabled = isLast);
@@ -526,15 +1065,246 @@
             const newIdx = idx + direction;
             if (newIdx < 0 || newIdx >= CHAPTERS.length) return;
             currentChapter = CHAPTERS[newIdx].id;
+            panelIndex = 0;
             renderReader();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
+
+        /* ---------- SCROLL MODE ---------- */
+        function renderScrollMode(ch) {
+            const container = document.getElementById('panel-container');
+            container.innerHTML = ch.panels.map((p, i) => `
+            <div class="panel-fade" style="animation-delay:${i * 50}ms">
+              <img src="${p.img}" class="panel-img" alt="Panel ${i + 1}" loading="lazy" />
+              ${p.caption ? `<p class="font-ui text-xs sm:text-sm text-muted italic px-5 sm:px-8 py-4 bg-panel border-b border-line">${p.caption}</p>` : ''}
+            </div>
+          `).join('');
+
+            document.getElementById('reader-counter').textContent = `${ch.panels.length} HALAMAN`;
+
+            const fill = document.getElementById('read-progress-fill');
+            fill.style.width = '0%';
+            const onScroll = () => {
+                if (readingMode !== 'scroll') { window.removeEventListener('scroll', onScroll); return; }
+                const doc = document.documentElement;
+                const scrolled = doc.scrollTop;
+                const max = doc.scrollHeight - doc.clientHeight;
+                fill.style.width = max > 0 ? `${Math.min(100, (scrolled / max) * 100)}%` : '0%';
+            };
+            window.addEventListener('scroll', onScroll);
+        }
+
+        /* ---------- SLIDE MODE (horizontal swipe carousel) ---------- */
+        function renderSlideMode(ch) {
+            const container = document.getElementById('panel-container');
+            container.innerHTML = `
+            <div class="slide-viewport">
+              <div class="tap-zone" style="left:0;" onclick="slideStep(-1)"></div>
+              <div class="tap-zone" style="right:0;" onclick="slideStep(1)"></div>
+              <button class="slide-arrow" style="left:12px;" id="slide-prev" onclick="slideStep(-1)">‹</button>
+              <button class="slide-arrow" style="right:12px;" id="slide-next" onclick="slideStep(1)">›</button>
+              <div class="slide-track" id="slide-track">
+                ${ch.panels.map((p, i) => `
+                  <div class="slide-panel">
+                    <img src="${p.img}" alt="Panel ${i + 1}" loading="${i === 0 ? 'eager' : 'lazy'}" draggable="false" />
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+            <p id="slide-caption" class="font-ui text-xs sm:text-sm text-muted italic px-5 sm:px-8 py-4 bg-panel border-b border-line"></p>
+          `;
+            attachDragHandlers(document.getElementById('slide-track'), 'slide');
+            updateSlidePosition(ch, false);
+        }
+
+        function updateSlidePosition(ch, animate = true) {
+            const track = document.getElementById('slide-track');
+            if (!track) return;
+            track.classList.toggle('dragging', !animate);
+            track.style.transform = `translateX(-${panelIndex * 100}%)`;
+            document.getElementById('slide-caption').textContent = ch.panels[panelIndex].caption || '';
+            document.getElementById('slide-prev').disabled = panelIndex === 0;
+            document.getElementById('slide-next').disabled = panelIndex === ch.panels.length - 1;
+            updatePanelCounter(ch);
+        }
+
+        function slideStep(direction) {
+            const ch = CHAPTERS.find(c => c.id === currentChapter);
+            const newIndex = panelIndex + direction;
+            if (newIndex < 0 || newIndex >= ch.panels.length) {
+                if (newIndex >= ch.panels.length) offerNextChapter();
+                return;
+            }
+            panelIndex = newIndex;
+            updateSlidePosition(ch, true);
+        }
+
+        /* ---------- BOOK MODE (page-flip) ---------- */
+        function renderBookMode(ch) {
+            const container = document.getElementById('panel-container');
+            container.innerHTML = `
+            <div class="book-stage book-spine-shadow">
+              <div class="tap-zone" style="left:0;" onclick="bookStep(-1)"></div>
+              <div class="tap-zone" style="right:0;" onclick="bookStep(1)"></div>
+              <button class="slide-arrow" style="left:12px;" id="book-prev" onclick="bookStep(-1)">‹</button>
+              <button class="slide-arrow" style="right:12px;" id="book-next" onclick="bookStep(1)">›</button>
+              <div class="book-layer book-under" id="book-under">
+                <img id="book-under-img" src="" alt="" />
+              </div>
+              <div class="book-layer book-top" id="book-top">
+                <img id="book-top-img" src="${ch.panels[panelIndex].img}" alt="Halaman ${panelIndex + 1}" draggable="false" />
+              </div>
+            </div>
+            <p id="book-caption" class="font-ui text-xs sm:text-sm text-muted italic px-5 sm:px-8 py-4 bg-panel border-b border-line">${ch.panels[panelIndex].caption || ''}</p>
+          `;
+            attachDragHandlers(document.getElementById('book-top'), 'book');
+            updateBookControls(ch);
+        }
+
+        function updateBookControls(ch) {
+            const prevBtn = document.getElementById('book-prev');
+            const nextBtn = document.getElementById('book-next');
+            if (prevBtn) prevBtn.disabled = panelIndex === 0;
+            if (nextBtn) nextBtn.disabled = false;
+            updatePanelCounter(ch);
+        }
+
+        function bookStep(direction) {
+            if (isFlipping) return;
+            const ch = CHAPTERS.find(c => c.id === currentChapter);
+            const newIndex = panelIndex + direction;
+            if (newIndex < 0) return;
+            if (newIndex >= ch.panels.length) { offerNextChapter(); return; }
+
+            const top = document.getElementById('book-top');
+            const topImg = document.getElementById('book-top-img');
+            const underImg = document.getElementById('book-under-img');
+            if (!top) return;
+
+            isFlipping = true;
+            underImg.src = ch.panels[newIndex].img; // reveal target underneath
+
+            if (direction > 0) {
+                top.classList.remove('flip-back-origin');
+                top.classList.add('flip-fwd');
+            } else {
+                top.classList.add('flip-back-origin');
+                top.classList.add('flip-bwd');
+            }
+
+            setTimeout(() => {
+                panelIndex = newIndex;
+                topImg.src = ch.panels[panelIndex].img;
+                top.classList.remove('flip-fwd', 'flip-bwd', 'flip-back-origin');
+                void top.offsetWidth;
+                document.getElementById('book-caption').textContent = ch.panels[panelIndex].caption || '';
+                updateBookControls(ch);
+                isFlipping = false;
+            }, 560);
+        }
+
+        /* ---------- SHARED: counter, drag/swipe, keyboard, chapter-end prompt ---------- */
+        function updatePanelCounter(ch) {
+            document.getElementById('reader-counter').textContent = `${panelIndex + 1} / ${ch.panels.length}`;
+        }
+
+        function offerNextChapter() {
+            const idx = CHAPTERS.findIndex(c => c.id === currentChapter);
+            const hasNext = idx < CHAPTERS.length - 1;
+            const el = document.createElement('div');
+            el.className = 'end-of-chapter-card fixed inset-0 z-50 flex items-center justify-center bg-void/80 backdrop-blur-sm px-5';
+            el.innerHTML = `
+            <div class="max-w-sm w-full bg-panel border border-line rounded-sm p-6 text-center">
+              <p class="font-ui text-anomaly tracking-[0.25em] text-xs mb-2">AKHIR CHAPTER</p>
+              <p class="font-display text-lg text-ink mb-5">${hasNext ? 'Lanjut ke chapter berikutnya?' : 'Kamu sudah membaca semua chapter yang tersedia.'}</p>
+              <div class="flex gap-3 justify-center">
+                <button id="stay-btn" class="px-4 py-2 border border-line rounded-sm text-sm font-ui text-muted hover:text-ink transition-colors">TETAP DI SINI</button>
+                ${hasNext ? `<button id="next-ch-btn" class="px-4 py-2 bg-axiom text-void rounded-sm text-sm font-ui font-700 hover:bg-white transition-colors">CHAPTER SELANJUTNYA</button>` : ''}
+              </div>
+            </div>
+          `;
+            document.body.appendChild(el);
+            el.querySelector('#stay-btn').onclick = () => el.remove();
+            if (hasNext) el.querySelector('#next-ch-btn').onclick = () => { el.remove(); navChapter(1); };
+        }
+
+        function attachDragHandlers(el, mode) {
+            if (!el) return;
+            let startX = 0, startY = 0, dx = 0, dragging = false, lockedAxis = null;
+
+            const onStart = (x, y) => { startX = x; startY = y; dx = 0; dragging = true; lockedAxis = null; };
+            const onMove = (x, y) => {
+                if (!dragging) return;
+                const dy = y - startY;
+                dx = x - startX;
+                if (lockedAxis === null) lockedAxis = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
+                if (lockedAxis === 'y') return; // let vertical page scroll happen
+                if (mode === 'slide') {
+                    const track = document.getElementById('slide-track');
+                    track.classList.add('dragging');
+                    track.style.transform = `translateX(calc(-${panelIndex * 100}% + ${dx}px))`;
+                }
+            };
+            const onEnd = () => {
+                if (!dragging) return;
+                dragging = false;
+                if (lockedAxis === 'x' && Math.abs(dx) > 60) {
+                    if (mode === 'slide') slideStep(dx < 0 ? 1 : -1);
+                    else bookStep(dx < 0 ? 1 : -1);
+                } else if (mode === 'slide') {
+                    const ch = CHAPTERS.find(c => c.id === currentChapter);
+                    updateSlidePosition(ch, true);
+                }
+                lockedAxis = null;
+            };
+
+            el.addEventListener('touchstart', (e) => onStart(e.touches[0].clientX, e.touches[0].clientY), { passive: true });
+            el.addEventListener('touchmove', (e) => onMove(e.touches[0].clientX, e.touches[0].clientY), { passive: true });
+            el.addEventListener('touchend', onEnd);
+
+            el.addEventListener('mousedown', (e) => { onStart(e.clientX, e.clientY); e.preventDefault(); });
+            window.addEventListener('mousemove', (e) => { if (dragging) onMove(e.clientX, e.clientY); });
+            window.addEventListener('mouseup', onEnd);
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (document.getElementById('page-reader').classList.contains('hidden')) return;
+            if (document.activeElement && document.activeElement.id === 'comment-input') return;
+            if (readingMode === 'slide') {
+                if (e.key === 'ArrowRight') slideStep(1);
+                if (e.key === 'ArrowLeft') slideStep(-1);
+            } else if (readingMode === 'book') {
+                if (e.key === 'ArrowRight') bookStep(1);
+                if (e.key === 'ArrowLeft') bookStep(-1);
+            }
+        });
 
         /* ---------- LIKE ---------- */
         function toggleLike() {
             liked = !liked;
             likeCount += liked ? 1 : -1;
             updateLikeUI();
+            if (liked) spawnLikeBurst();
+        }
+
+        function spawnLikeBurst() {
+            const btn = document.getElementById('btn-like');
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+            btn.classList.remove('like-pulse');
+            void btn.offsetWidth;
+            btn.classList.add('like-pulse');
+            const n = 8;
+            for (let i = 0; i < n; i++) {
+                const dot = document.createElement('span');
+                dot.className = 'like-burst';
+                const angle = (Math.PI * 2 * i) / n + Math.random() * 0.3;
+                const dist = 26 + Math.random() * 18;
+                dot.style.setProperty('--bx', `${Math.cos(angle) * dist}px`);
+                dot.style.setProperty('--by', `${Math.sin(angle) * dist}px`);
+                dot.style.background = i % 2 === 0 ? '#3DA9FC' : '#8B7CF6';
+                btn.appendChild(dot);
+                dot.addEventListener('animationend', () => dot.remove());
+            }
         }
 
         function updateLikeUI() {
@@ -548,8 +1318,8 @@
         /* ---------- COMMENTS ---------- */
         function renderComments() {
             document.getElementById('comment-count').textContent = comments.length;
-            document.getElementById('comment-list').innerHTML = comments.map(c => `
-            <div class="border border-line rounded-sm p-4 bg-panel">
+            document.getElementById('comment-list').innerHTML = comments.map((c, i) => `
+            <div class="panel-fade border border-line rounded-sm p-4 bg-panel" style="animation-delay:${Math.min(i, 6) * 40}ms">
               <p class="font-ui text-xs text-axiom tracking-wide mb-1">${c.name}</p>
               <p class="text-sm text-ink/90">${c.text}</p>
             </div>
@@ -563,6 +1333,7 @@
             comments.unshift({ name: 'kamu', text });
             input.value = '';
             renderComments();
+            showToast('Komentar terkirim');
         }
 
         document.addEventListener('keypress', (e) => {
